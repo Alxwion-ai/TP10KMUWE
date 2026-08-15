@@ -1,0 +1,1047 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Uwes Trainings-Coach | Triathlon 27.09.</title>
+<style>
+    :root {
+        --primary: #2563eb;
+        --primary-dark: #1e40af;
+        --success: #16a34a;
+        --warning: #d97706;
+        --danger: #dc2626;
+        --bg: #f8fafc;
+        --card: #ffffff;
+        --text: #1e293b;
+        --text-light: #64748b;
+        --border: #e2e8f0;
+        --swim: #06b6d4;
+        --bike: #f59e0b;
+        --run: #ef4444;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+    body { background: var(--bg); color: var(--text); padding-bottom: 40px; }
+    
+    .container { max-width: 800px; margin: 0 auto; padding: 16px; }
+    
+    header {
+        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+        color: white;
+        padding: 24px 16px;
+        border-radius: 0 0 24px 24px;
+        margin-bottom: 16px;
+        box-shadow: 0 4px 12px rgba(37,99,235,0.3);
+    }
+    header h1 { font-size: 1.5rem; margin-bottom: 4px; }
+    header p { opacity: 0.9; font-size: 0.9rem; }
+    
+    .countdown {
+        background: rgba(255,255,255,0.15);
+        border-radius: 12px;
+        padding: 12px;
+        margin-top: 12px;
+        text-align: center;
+        font-weight: 600;
+    }
+    .countdown .tapering { color: #fbbf24; font-size: 0.85rem; margin-top: 4px; }
+    
+    .tabs {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 16px;
+        background: var(--card);
+        padding: 6px;
+        border-radius: 12px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        flex-wrap: wrap;
+    }
+    .tab {
+        padding: 10px 12px;
+        text-align: center;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: var(--text-light);
+        transition: all 0.2s;
+        border: none;
+        background: transparent;
+    }
+    .tab.active { background: var(--primary); color: white; }
+    
+    .section { display: none; }
+    .section.active { display: block; }
+    
+    .card {
+        background: var(--card);
+        border-radius: 16px;
+        padding: 20px;
+        margin-bottom: 16px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    }
+    .card h2 { font-size: 1.1rem; margin-bottom: 12px; color: var(--primary-dark); }
+    .card h3 { font-size: 1rem; margin: 12px 0 8px; }
+    
+    label { display: block; font-size: 0.85rem; font-weight: 600; margin: 12px 0 6px; color: var(--text-light); }
+    select, input, textarea {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        font-size: 1rem;
+        background: white;
+    }
+    
+    .btn {
+        display: inline-block;
+        padding: 12px 20px;
+        background: var(--primary);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        font-size: 0.95rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: transform 0.1s;
+        margin-right: 8px;
+        margin-top: 8px;
+    }
+    .btn:active { transform: scale(0.98); }
+    .btn.secondary { background: #e2e8f0; color: var(--text); }
+    .btn.danger { background: var(--danger); }
+    .btn.success { background: var(--success); }
+    .btn.full { width: 100%; margin-right: 0; }
+    
+    /* Calendar Styles */
+    .calendar-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 16px;
+    }
+    .calendar-header h2 { margin: 0; }
+    .calendar-nav {
+        display: flex;
+        gap: 8px;
+    }
+    .calendar-grid {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 4px;
+    }
+    .calendar-day-header {
+        text-align: center;
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: var(--text-light);
+        padding: 8px 4px;
+    }
+    .calendar-day {
+        aspect-ratio: 1;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 4px;
+        cursor: pointer;
+        transition: all 0.2s;
+        background: white;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        min-height: 70px;
+    }
+    .calendar-day:hover { border-color: var(--primary); background: #eff6ff; }
+    .calendar-day.today { border-color: var(--primary); border-width: 2px; }
+    .calendar-day.other-month { opacity: 0.4; background: #f1f5f9; }
+    .calendar-day .day-num { font-size: 0.8rem; font-weight: 700; }
+    .calendar-day .workout-dots { display: flex; gap: 2px; flex-wrap: wrap; }
+    .calendar-day .workout-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+    }
+    .workout-dot.swim { background: var(--swim); }
+    .workout-dot.bike { background: var(--bike); }
+    .workout-dot.run { background: var(--run); }
+    
+    /* Workout Modal */
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0,0,0,0.5);
+        display: none;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+    }
+    .modal-overlay.active { display: flex; }
+    .modal {
+        background: var(--card);
+        border-radius: 16px;
+        padding: 24px;
+        max-width: 500px;
+        width: 90%;
+        max-height: 90vh;
+        overflow-y: auto;
+    }
+    .modal h2 { margin-bottom: 16px; }
+    
+    /* Sport Type Selector */
+    .sport-selector {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 16px;
+    }
+    .sport-btn {
+        flex: 1;
+        padding: 12px;
+        border: 2px solid var(--border);
+        border-radius: 10px;
+        background: white;
+        cursor: pointer;
+        font-weight: 600;
+        transition: all 0.2s;
+    }
+    .sport-btn.selected { border-color: var(--primary); background: #eff6ff; }
+    .sport-btn.swim.selected { border-color: var(--swim); background: #ecfeff; }
+    .sport-btn.bike.selected { border-color: var(--bike); background: #fffbeb; }
+    .sport-btn.run.selected { border-color: var(--run); background: #fef2f2; }
+    
+    /* Template Grid */
+    .template-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        gap: 8px;
+        margin-bottom: 16px;
+    }
+    .template-card {
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 12px;
+        cursor: pointer;
+        transition: all 0.2s;
+        text-align: center;
+    }
+    .template-card:hover { border-color: var(--primary); background: #eff6ff; }
+    .template-card .icon { font-size: 1.5rem; margin-bottom: 4px; }
+    .template-card .name { font-size: 0.8rem; font-weight: 600; }
+    .template-card .details { font-size: 0.7rem; color: var(--text-light); }
+    
+    /* Log List */
+    .log-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px;
+        border-bottom: 1px solid var(--border);
+    }
+    .log-item:last-child { border-bottom: none; }
+    .log-item input[type="checkbox"] { width: auto; }
+    .log-item .details { flex: 1; font-size: 0.9rem; }
+    .log-item .details small { color: var(--text-light); }
+    .log-item .sport-badge {
+        font-size: 0.7rem;
+        padding: 2px 8px;
+        border-radius: 10px;
+        font-weight: 700;
+        color: white;
+    }
+    .sport-badge.swim { background: var(--swim); }
+    .sport-badge.bike { background: var(--bike); }
+    .sport-badge.run { background: var(--run); }
+    
+    /* Stats */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+        margin-bottom: 16px;
+    }
+    .stat-card {
+        background: #f1f5f9;
+        border-radius: 12px;
+        padding: 16px;
+        text-align: center;
+    }
+    .stat-card .value { font-size: 1.5rem; font-weight: 700; color: var(--primary-dark); }
+    .stat-card .label { font-size: 0.75rem; color: var(--text-light); }
+    .stat-card.swim .value { color: var(--swim); }
+    .stat-card.bike .value { color: var(--bike); }
+    .stat-card.run .value { color: var(--run); }
+    
+    @media (max-width: 600px) {
+        .tabs { justify-content: center; }
+        .tab { font-size: 0.75rem; padding: 8px 10px; }
+        .calendar-day { min-height: 50px; }
+        .stats-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+</style>
+</head>
+<body>
+
+<header>
+    <div class="container" style="padding:0">
+        <h1>🏊‍♂️🚴‍♂️🏃‍♂️ Uwes Trainings-Coach</h1>
+        <p>Ziel: Triathlon / 10km am 27. September</p>
+        <div class="countdown">
+            <span id="countdown-text"></span>
+            <div class="tapering" id="tapering-hint"></div>
+        </div>
+    </div>
+</header>
+
+<div class="container">
+    <div class="tabs">
+        <button class="tab active" onclick="switchTab('calendar', this)">📅 Kalender</button>
+        <button class="tab" onclick="switchTab('coach', this)">🤖 Coach</button>
+        <button class="tab" onclick="switchTab('templates', this)">📦 Vorlagen</button>
+        <button class="tab" onclick="switchTab('log', this)">📖 Trainingstagebuch</button>
+        <button class="tab" onclick="switchTab('settings', this)">⚙️ Einstellungen</button>
+    </div>
+
+    <!-- CALENDAR SECTION -->
+    <div id="calendar" class="section active">
+        <div class="card">
+            <div class="calendar-header">
+                <button class="btn secondary" onclick="changeMonth(-1)">◀ Zurück</button>
+                <h2 id="calendar-title"></h2>
+                <button class="btn secondary" onclick="changeMonth(1)">Vor ▶</button>
+            </div>
+            <div class="calendar-grid" id="calendar-grid"></div>
+        </div>
+        
+        <div class="card">
+            <h2>Wochenübersicht</h2>
+            <div class="stats-grid" id="weekly-stats"></div>
+        </div>
+    </div>
+
+    <!-- COACH SECTION -->
+    <div id="coach" class="section">
+        <div class="card">
+            <h2>Hey Uwe! 👋</h2>
+            <p style="font-size:0.9rem; color:var(--text-light); margin-bottom:12px">
+                Lass uns schauen, was heute für dich passt. Beantworte kurz zwei Fragen:
+            </p>
+            
+            <label>Wie viel Zeit hast du heute?</label>
+            <select id="time-select">
+                <option value="30">⚡ 30 Minuten</option>
+                <option value="45">🕐 45 Minuten</option>
+                <option value="60" selected>🕰️ 60 Minuten</option>
+                <option value="90">🏋️ 90+ Minuten</option>
+            </select>
+            
+            <label>Wie fühlen sich deine Beine an? (1 = schwer, 10 = frisch)</label>
+            <select id="legs-select">
+                <option value="1">1 – Total platt</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5 – Okay</option>
+                <option value="6">6</option>
+                <option value="7" selected>7 – Gut</option>
+                <option value="8">8</option>
+                <option value="9">9</option>
+                <option value="10">10 – Frisch wie am ersten Tag</option>
+            </select>
+            
+            <label>Welche Sportart möchtest du machen?</label>
+            <select id="sport-select-coach">
+                <option value="run">🏃 Laufen</option>
+                <option value="bike">🚴 Radfahren</option>
+                <option value="swim">🏊 Schwimmen</option>
+            </select>
+            
+            <button class="btn full" onclick="recommendWorkout()">💡 Empfehlung holen</button>
+            
+            <div id="recommendation-output"></div>
+        </div>
+    </div>
+
+    <!-- TEMPLATES SECTION -->
+    <div id="templates" class="section">
+        <div class="card">
+            <h2>Vorlagen durchsuchen</h2>
+            <label>Sportart filtern</label>
+            <select id="template-filter" onchange="renderTemplates()">
+                <option value="all">Alle anzeigen</option>
+                <option value="swim">🏊 Schwimmen</option>
+                <option value="bike">🚴 Radfahren</option>
+                <option value="run">🏃 Laufen</option>
+            </select>
+            <div class="template-grid" id="templates-list" style="margin-top:12px"></div>
+        </div>
+    </div>
+
+    <!-- LOG SECTION -->
+    <div id="log" class="section">
+        <div class="card">
+            <h2>Trainingstagebuch</h2>
+            <div class="stats-grid" id="log-stats"></div>
+            <div id="log-list"></div>
+        </div>
+    </div>
+
+    <!-- SETTINGS SECTION -->
+    <div id="settings" class="section">
+        <div class="card">
+            <h2>Daten verwalten</h2>
+            <p style="font-size:0.9rem; color:var(--text-light); margin-bottom:16px">
+                Deine Daten werden automatisch im Browser gespeichert. Du kannst sie auch exportieren und importieren.
+            </p>
+            <button class="btn" onclick="exportData()">📤 Daten exportieren (JSON)</button>
+            <button class="btn secondary" onclick="document.getElementById('import-file').click()">📥 Daten importieren</button>
+            <input type="file" id="import-file" accept=".json" style="display:none" onchange="importData(this)">
+            <br><br>
+            <button class="btn danger" onclick="clearAllData()">⚠️ Alle Daten löschen</button>
+        </div>
+        
+        <div class="card">
+            <h2>Eigene Vorlage erstellen</h2>
+            <p style="font-size:0.9rem; color:var(--text-light); margin-bottom:12px">
+                Erstelle eine benutzerdefinierte Trainingseinheit.
+            </p>
+            <label>Sportart</label>
+            <select id="custom-sport">
+                <option value="swim">🏊 Schwimmen</option>
+                <option value="bike">🚴 Radfahren</option>
+                <option value="run">🏃 Laufen</option>
+            </select>
+            <label>Name der Einheit</label>
+            <input type="text" id="custom-name" placeholder="z.B. Lockere Runde im Park">
+            <label>Distanz / Dauer</label>
+            <input type="text" id="custom-distance" placeholder="z.B. 5 km oder 45 Min">
+            <label>Beschreibung</label>
+            <textarea id="custom-desc" rows="3" placeholder="Details zur Einheit..."></textarea>
+            <label>Intensität</label>
+            <select id="custom-intensity">
+                <option value="easy">Locker (Erholung)</option>
+                <option value="medium">Mittel (Grundlage)</option>
+                <option value="hard">Hart (Intervalle/Wettkampf)</option>
+            </select>
+            <button class="btn full" onclick="addCustomTemplate()">✅ Vorlage speichern</button>
+        </div>
+    </div>
+</div>
+
+<!-- WORKOUT MODAL -->
+<div class="modal-overlay" id="workout-modal">
+    <div class="modal">
+        <h2 id="modal-date-title">Training eintragen</h2>
+        
+        <label>Sportart wählen</label>
+        <div class="sport-selector">
+            <button class="sport-btn swim" onclick="selectSport('swim')">🏊 Schwimmen</button>
+            <button class="sport-btn bike" onclick="selectSport('bike')">🚴 Radfahren</button>
+            <button class="sport-btn run" onclick="selectSport('run')">🏃 Laufen</button>
+        </div>
+        
+        <label>Vorlage auswählen (optional)</label>
+        <div class="template-grid" id="modal-templates"></div>
+        
+        <label>Oder selbst eingeben</label>
+        <input type="text" id="manual-name" placeholder="Name der Einheit">
+        <input type="text" id="manual-distance" placeholder="Distanz/Dauer (z.B. 5 km, 45 Min)">
+        <textarea id="manual-desc" rows="2" placeholder="Beschreibung (optional)" style="margin-top:8px"></textarea>
+        
+        <label>Intensität</label>
+        <select id="manual-intensity">
+            <option value="easy">Locker</option>
+            <option value="medium" selected>Mittel</option>
+            <option value="hard">Hart</option>
+        </select>
+        
+        <div style="margin-top:16px; display:flex; gap:8px; flex-wrap:wrap">
+            <button class="btn success" onclick="saveWorkout()">✅ Speichern</button>
+            <button class="btn secondary" onclick="closeModal()">Abbrechen</button>
+            <button class="btn danger" onclick="deleteDayWorkouts()" id="btn-delete-day">🗑️ Einheiten löschen</button>
+        </div>
+    </div>
+</div>
+
+<script>
+// ==================== KONFIGURATION ====================
+const RACE_DATE = new Date('2026-09-27');
+
+const DEFAULT_TEMPLATES = [
+    // Schwimmen
+    { id: 'swim_easy', name: 'Lockeres Schwimmen', sport: 'swim', distance: '1000m', desc: 'Ganz locker schwimmen, Technik fokussieren', intensity: 'easy' },
+    { id: 'swim_intervals', name: 'Kraul-Intervalle', sport: 'swim', distance: '1500m', desc: '10×100m schnell, 30s Pause dazwischen', intensity: 'hard' },
+    { id: 'swim_technik', name: 'Technik-Training', sport: 'swim', distance: '1200m', desc: 'Drills: Catch-up, Fists, Side-kicking', intensity: 'easy' },
+    { id: 'swim_lang', name: 'Langer Ausdauer-Schwimm', sport: 'swim', distance: '2000m+', desc: 'Durchgehendes Schwimmen in Zone 2', intensity: 'medium' },
+    
+    // Radfahren
+    { id: 'bike_easy', name: 'Lockere Runde', sport: 'bike', distance: '30 km', desc: 'Ganz locker rollen lassen, Beine bewegen', intensity: 'easy' },
+    { id: 'bike_intervals', name: 'Rad-Intervalle', sport: 'bike', distance: '40 km', desc: '5×5 Min hart, 3 Min locker dazwischen', intensity: 'hard' },
+    { id: 'bike_schwelle', name: 'Schwellen-Training', sport: 'bike', distance: '45 km', desc: '20 Min einrollen, 2×15 Min an der Schwelle', intensity: 'hard' },
+    { id: 'bike_lang', name: 'Lange Ausfahrt', sport: 'bike', distance: '60+ km', desc: 'Lange, ruhige Fahrt in Zone 2', intensity: 'medium' },
+    { id: 'bike_rolling', name: 'Roller-Training', sport: 'bike', distance: '45 Min', desc: 'Indoor auf dem Roller, konstantes Tempo', intensity: 'medium' },
+    
+    // Laufen
+    { id: 'run_easy', name: 'Lockrer Lauf', sport: 'run', distance: '5 km', desc: 'Ganz locker, Unterhaltungstempo', intensity: 'easy' },
+    { id: 'run_vo2max', name: 'VO2max-Intervalle', sport: 'run', distance: '8 km', desc: '5×1000m in 4:50-5:00 min/km, 2 Min Trabpause', intensity: 'hard' },
+    { id: 'run_schwelle', name: 'Schwellenlauf', sport: 'run', distance: '8 km', desc: '2 km einlaufen, 4-5 km an der Schwelle, 1 km auslaufen', intensity: 'hard' },
+    { id: 'run_lang', name: 'Langer Lauf', sport: 'run', distance: '10-12 km', desc: 'Langsam und stetig, Zone 2', intensity: 'medium' },
+    { id: 'run_fahrtspiel', name: 'Fahrtspiel', sport: 'run', distance: '6 km', desc: '30-40 Min mit spielerischen Tempowechseln', intensity: 'medium' },
+    { id: 'run_recovery', name: 'Regenerationslauf', sport: 'run', distance: '3-4 km', desc: 'Sehr locker, nur zur Bewegung', intensity: 'easy' }
+];
+
+let state = loadState();
+let currentMonth = new Date();
+let selectedDate = null;
+let selectedSport = 'run';
+
+// ==================== STATE MANAGEMENT ====================
+function loadState() {
+    try {
+        const saved = localStorage.getItem('uwe-triathlon-state');
+        if (saved) {
+            const parsed = JSON.parse(saved);
+            return {
+                workouts: parsed.workouts || {},
+                customTemplates: parsed.customTemplates || [],
+                log: parsed.log || []
+            };
+        }
+    } catch (e) {
+        console.error('Fehler beim Laden:', e);
+    }
+    return { workouts: {}, customTemplates: [], log: [] };
+}
+
+function saveState() {
+    localStorage.setItem('uwe-triathlon-state', JSON.stringify(state));
+}
+
+function getAllTemplates() {
+    return [...DEFAULT_TEMPLATES, ...state.customTemplates];
+}
+
+// ==================== TABS ====================
+function switchTab(tabId, btn) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.getElementById(tabId).classList.add('active');
+    btn.classList.add('active');
+    
+    if (tabId === 'calendar') renderCalendar();
+    if (tabId === 'log') renderLog();
+    if (tabId === 'templates') renderTemplates();
+}
+
+// ==================== COUNTDOWN ====================
+function updateCountdown() {
+    const now = new Date();
+    const diffTime = RACE_DATE - now;
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    
+    const el = document.getElementById('countdown-text');
+    const hint = document.getElementById('tapering-hint');
+    
+    if (diffDays > 0) {
+        el.textContent = `⏱️ Noch ${diffDays} Tage bis zum Wettkampf`;
+    } else if (diffDays === 0) {
+        el.textContent = `🎯 HEUTE IST WETTKAMPFTAG! Viel Erfolg, Uwe!`;
+    } else {
+        el.textContent = `✅ Der Wettkampf ist geschafft!`;
+    }
+    
+    if (diffDays <= 7 && diffDays > 0) {
+        hint.textContent = `⚠️ Tapering-Phase: Volumen reduzieren, intensiv bleiben!`;
+    } else {
+        hint.textContent = '';
+    }
+}
+
+// ==================== CALENDAR ====================
+function renderCalendar() {
+    const year = currentMonth.getFullYear();
+    const month = currentMonth.getMonth();
+    
+    const monthNames = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 
+                        'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
+    document.getElementById('calendar-title').textContent = `${monthNames[month]} ${year}`;
+    
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+    const startDay = firstDay.getDay() || 7; // Montag = 1
+    
+    const grid = document.getElementById('calendar-grid');
+    grid.innerHTML = '';
+    
+    // Day headers
+    const dayNames = ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'];
+    dayNames.forEach(day => {
+        const header = document.createElement('div');
+        header.className = 'calendar-day-header';
+        header.textContent = day;
+        grid.appendChild(header);
+    });
+    
+    // Previous month days
+    const prevMonthLast = new Date(year, month, 0);
+    for (let i = startDay - 1; i > 0; i--) {
+        const dayNum = prevMonthLast.getDate() - i + 1;
+        const dayEl = createDayElement(new Date(year, month - 1, dayNum), true);
+        grid.appendChild(dayEl);
+    }
+    
+    // Current month days
+    const today = new Date();
+    for (let day = 1; day <= lastDay.getDate(); day++) {
+        const date = new Date(year, month, day);
+        const dayEl = createDayElement(date, false);
+        if (date.toDateString() === today.toDateString()) {
+            dayEl.classList.add('today');
+        }
+        grid.appendChild(dayEl);
+    }
+    
+    // Next month days
+    const remainingDays = 42 - (startDay - 1 + lastDay.getDate());
+    for (let day = 1; day <= remainingDays; day++) {
+        const dayEl = createDayElement(new Date(year, month + 1, day), true);
+        grid.appendChild(dayEl);
+    }
+    
+    renderWeeklyStats();
+}
+
+function createDayElement(date, isOtherMonth) {
+    const dateStr = date.toISOString().split('T')[0];
+    const dayEl = document.createElement('div');
+    dayEl.className = 'calendar-day' + (isOtherMonth ? ' other-month' : '');
+    dayEl.onclick = () => openWorkoutModal(dateStr);
+    
+    const workouts = state.workouts[dateStr] || [];
+    const dots = workouts.map(w => {
+        return `<div class="workout-dot ${w.sport}" title="${w.name}"></div>`;
+    }).join('');
+    
+    dayEl.innerHTML = `
+        <div class="day-num">${date.getDate()}</div>
+        <div class="workout-dots">${dots}</div>
+    `;
+    
+    return dayEl;
+}
+
+function changeMonth(delta) {
+    currentMonth.setMonth(currentMonth.getMonth() + delta);
+    renderCalendar();
+}
+
+function renderWeeklyStats() {
+    const today = new Date();
+    const startOfWeek = new Date(today);
+    startOfWeek.setDate(today.getDate() - today.getDay() + 1);
+    startOfWeek.setHours(0, 0, 0, 0);
+    
+    let swimDist = 0, bikeDist = 0, runDist = 0;
+    
+    for (let i = 0; i < 7; i++) {
+        const date = new Date(startOfWeek);
+        date.setDate(startOfWeek.getDate() + i);
+        const dateStr = date.toISOString().split('T')[0];
+        const workouts = state.workouts[dateStr] || [];
+        
+        workouts.forEach(w => {
+            const dist = parseFloat(w.distance) || 0;
+            if (w.sport === 'swim') swimDist += dist;
+            else if (w.sport === 'bike') bikeDist += dist;
+            else if (w.sport === 'run') runDist += dist;
+        });
+    }
+    
+    document.getElementById('weekly-stats').innerHTML = `
+        <div class="stat-card swim">
+            <div class="value">${swimDist.toFixed(1)} km</div>
+            <div class="label">🏊 Schwimmen</div>
+        </div>
+        <div class="stat-card bike">
+            <div class="value">${bikeDist.toFixed(1)} km</div>
+            <div class="label">🚴 Radfahren</div>
+        </div>
+        <div class="stat-card run">
+            <div class="value">${runDist.toFixed(1)} km</div>
+            <div class="label">🏃 Laufen</div>
+        </div>
+    `;
+}
+
+// ==================== WORKOUT MODAL ====================
+function openWorkoutModal(dateStr) {
+    selectedDate = dateStr;
+    const date = new Date(dateStr);
+    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    document.getElementById('modal-date-title').textContent = date.toLocaleDateString('de-DE', options);
+    
+    document.getElementById('workout-modal').classList.add('active');
+    document.getElementById('manual-name').value = '';
+    document.getElementById('manual-distance').value = '';
+    document.getElementById('manual-desc').value = '';
+    document.getElementById('manual-intensity').value = 'medium';
+    
+    selectSport('run');
+    renderModalTemplates();
+    
+    const workouts = state.workouts[dateStr] || [];
+    document.getElementById('btn-delete-day').style.display = workouts.length > 0 ? 'inline-block' : 'none';
+}
+
+function closeModal() {
+    document.getElementById('workout-modal').classList.remove('active');
+    selectedDate = null;
+    renderCalendar();
+}
+
+function selectSport(sport) {
+    selectedSport = sport;
+    document.querySelectorAll('.sport-btn').forEach(btn => {
+        btn.classList.remove('selected');
+        if (btn.classList.contains(sport)) btn.classList.add('selected');
+    });
+    renderModalTemplates();
+}
+
+function renderModalTemplates() {
+    const container = document.getElementById('modal-templates');
+    const templates = getAllTemplates().filter(t => t.sport === selectedSport);
+    
+    container.innerHTML = templates.map(t => {
+        const icon = t.sport === 'swim' ? '🏊' : t.sport === 'bike' ? '🚴' : '🏃';
+        const intensityBadge = t.intensity === 'hard' ? '🔴' : t.intensity === 'medium' ? '🟡' : '🟢';
+        return `
+            <div class="template-card" onclick="useTemplate('${t.id}')">
+                <div class="icon">${icon}</div>
+                <div class="name">${t.name}</div>
+                <div class="details">${t.distance} ${intensityBadge}</div>
+            </div>
+        `;
+    }).join('');
+}
+
+function useTemplate(templateId) {
+    const template = getAllTemplates().find(t => t.id === templateId);
+    if (!template) return;
+    
+    document.getElementById('manual-name').value = template.name;
+    document.getElementById('manual-distance').value = template.distance;
+    document.getElementById('manual-desc').value = template.desc;
+    document.getElementById('manual-intensity').value = template.intensity;
+}
+
+function saveWorkout() {
+    if (!selectedDate) return;
+    
+    const name = document.getElementById('manual-name').value.trim();
+    const distance = document.getElementById('manual-distance').value.trim();
+    const desc = document.getElementById('manual-desc').value.trim();
+    const intensity = document.getElementById('manual-intensity').value;
+    
+    if (!name || !distance) {
+        alert('Bitte Name und Distanz/Dauer eingeben!');
+        return;
+    }
+    
+    if (!state.workouts[selectedDate]) {
+        state.workouts[selectedDate] = [];
+    }
+    
+    state.workouts[selectedDate].push({
+        id: Date.now(),
+        sport: selectedSport,
+        name: name,
+        distance: distance,
+        description: desc,
+        intensity: intensity,
+        completed: false
+    });
+    
+    saveState();
+    addToLog({
+        id: Date.now(),
+        date: selectedDate,
+        sport: selectedSport,
+        name: name,
+        distance: distance,
+        completed: false
+    });
+    
+    closeModal();
+    renderCalendar();
+}
+
+function deleteDayWorkouts() {
+    if (!selectedDate) return;
+    if (!confirm('Wirklich alle Einheiten an diesem Tag löschen?')) return;
+    
+    delete state.workouts[selectedDate];
+    saveState();
+    closeModal();
+    renderCalendar();
+}
+
+// ==================== COACH ====================
+function recommendWorkout() {
+    const time = parseInt(document.getElementById('time-select').value);
+    const legs = parseInt(document.getElementById('legs-select').value);
+    const sport = document.getElementById('sport-select-coach').value;
+    
+    const templates = getAllTemplates().filter(t => t.sport === sport);
+    let rec = null;
+    let reason = '';
+    
+    const tapering = Math.ceil((RACE_DATE - new Date()) / (1000 * 60 * 60 * 24)) <= 7;
+    
+    if (tapering) {
+        rec = templates.find(t => t.intensity === 'easy') || templates[0];
+        reason = 'Tapering-Phase: Lockere Einheit empfohlen.';
+    } else if (legs <= 4) {
+        rec = templates.find(t => t.intensity === 'easy') || templates[0];
+        reason = 'Deine Beine sind schwer – Regeneration ist wichtig!';
+    } else if (time <= 30) {
+        rec = templates.find(t => t.intensity !== 'hard' && parseFloat(t.distance) < 10) || templates[0];
+        reason = 'Bei wenig Zeit: Kurze, effektive Einheit.';
+    } else if (time >= 90) {
+        rec = templates.find(t => t.distance.includes('lang') || t.distance.includes('Ausdauer')) || 
+              templates.find(t => t.intensity === 'medium') || templates[0];
+        reason = 'Viel Zeit – perfekt für eine lange Ausdauereinheit!';
+    } else {
+        if (legs >= 7) {
+            rec = templates.find(t => t.intensity === 'hard') || templates.find(t => t.intensity === 'medium') || templates[0];
+            reason = 'Frische Beine – Zeit für eine intensive Einheit!';
+        } else {
+            rec = templates.find(t => t.intensity === 'medium') || templates[0];
+            reason = 'Solides Grundlagentraining für heute.';
+        }
+    }
+    
+    const icon = sport === 'swim' ? '🏊' : sport === 'bike' ? '🚴' : '🏃';
+    const sportName = sport === 'swim' ? 'Schwimmen' : sport === 'bike' ? 'Radfahren' : 'Laufen';
+    
+    document.getElementById('recommendation-output').innerHTML = `
+        <div class="recommendation" style="background:#eff6ff; border-left:4px solid var(--primary); border-radius:10px; padding:16px; margin-top:16px">
+            <h3>💡 Meine Empfehlung:</h3>
+            <div style="font-size:1.2rem; font-weight:700; color:var(--primary-dark); margin:8px 0">
+                ${icon} ${rec.name}
+            </div>
+            <p style="margin:8px 0; font-size:0.9rem">${reason}</p>
+            <div style="font-size:0.85rem; background:white; padding:10px; border-radius:8px; margin-top:8px">
+                <strong>Distanz/Dauer:</strong> ${rec.distance}<br>
+                <strong>Intensität:</strong> ${rec.intensity === 'hard' ? 'Hart 🔴' : rec.intensity === 'medium' ? 'Mittel 🟡' : 'Locker 🟢'}<br>
+                <span style="color:var(--text-light)">${rec.desc}</span>
+            </div>
+            <button class="btn full" onclick="quickAddFromCoach('${rec.id}', '${sport}')">✅ Für heute übernehmen</button>
+        </div>
+    `;
+}
+
+function quickAddFromCoach(templateId, sport) {
+    const template = getAllTemplates().find(t => t.id === templateId);
+    if (!template) return;
+    
+    const today = new Date().toISOString().split('T')[0];
+    selectedDate = today;
+    selectedSport = sport;
+    
+    document.getElementById('manual-name').value = template.name;
+    document.getElementById('manual-distance').value = template.distance;
+    document.getElementById('manual-desc').value = template.desc;
+    document.getElementById('manual-intensity').value = template.intensity;
+    
+    saveWorkout();
+}
+
+// ==================== TEMPLATES ====================
+function renderTemplates() {
+    const filter = document.getElementById('template-filter').value;
+    const container = document.getElementById('templates-list');
+    let templates = getAllTemplates();
+    
+    if (filter !== 'all') {
+        templates = templates.filter(t => t.sport === filter);
+    }
+    
+    container.innerHTML = templates.map(t => {
+        const icon = t.sport === 'swim' ? '🏊' : t.sport === 'bike' ? '🚴' : '🏃';
+        const intensityBadge = t.intensity === 'hard' ? '🔴' : t.intensity === 'medium' ? '🟡' : '🟢';
+        return `
+            <div class="template-card" onclick="useTemplate('${t.id}'); switchTab('calendar', document.querySelector('.tab'))">
+                <div class="icon">${icon}</div>
+                <div class="name">${t.name}</div>
+                <div class="details">${t.distance} ${intensityBadge}</div>
+            </div>
+        `;
+    }).join('');
+}
+
+// ==================== LOG ====================
+function addToLog(workout) {
+    state.log.unshift({
+        id: workout.id,
+        date: workout.date,
+        sport: workout.sport,
+        name: workout.name,
+        distance: workout.distance,
+        completed: false
+    });
+    saveState();
+}
+
+function toggleLog(id) {
+    const item = state.log.find(l => l.id === id);
+    if (item) {
+        item.completed = !item.completed;
+        saveState();
+        renderLog();
+    }
+}
+
+function deleteLog(id) {
+    state.log = state.log.filter(l => l.id !== id);
+    saveState();
+    renderLog();
+}
+
+function renderLog() {
+    const list = document.getElementById('log-list');
+    const statsContainer = document.getElementById('log-stats');
+    
+    if (state.log.length === 0) {
+        list.innerHTML = '<p style="color:var(--text-light); font-size:0.9rem; padding:20px; text-align:center">Noch keine Einheiten eingetragen. Klicke auf einen Tag im Kalender! 💪</p>';
+        statsContainer.innerHTML = '';
+        return;
+    }
+    
+    // Calculate stats
+    let swimCount = 0, bikeCount = 0, runCount = 0;
+    state.log.forEach(l => {
+        if (l.sport === 'swim') swimCount++;
+        else if (l.sport === 'bike') bikeCount++;
+        else if (l.sport === 'run') runCount++;
+    });
+    
+    statsContainer.innerHTML = `
+        <div class="stat-card swim">
+            <div class="value">${swimCount}</div>
+            <div class="label">🏊 Einheiten</div>
+        </div>
+        <div class="stat-card bike">
+            <div class="value">${bikeCount}</div>
+            <div class="label">🚴 Einheiten</div>
+        </div>
+        <div class="stat-card run">
+            <div class="value">${runCount}</div>
+            <div class="label">🏃 Einheiten</div>
+        </div>
+    `;
+    
+    list.innerHTML = state.log.map(item => {
+        const sportIcon = item.sport === 'swim' ? '🏊' : item.sport === 'bike' ? '🚴' : '🏃';
+        return `
+            <div class="log-item" style="${item.completed ? 'opacity:0.5' : ''}">
+                <input type="checkbox" ${item.completed ? 'checked' : ''} onchange="toggleLog(${item.id})">
+                <div class="details">
+                    <span class="sport-badge ${item.sport}">${sportIcon}</span>
+                    <strong>${item.name}</strong><br>
+                    <small>${new Date(item.date).toLocaleDateString('de-DE')} · ${item.distance}</small>
+                </div>
+                <button onclick="deleteLog(${item.id})" style="background:none; border:none; cursor:pointer; font-size:1.2rem">🗑️</button>
+            </div>
+        `;
+    }).join('');
+}
+
+// ==================== CUSTOM TEMPLATES ====================
+function addCustomTemplate() {
+    const sport = document.getElementById('custom-sport').value;
+    const name = document.getElementById('custom-name').value.trim();
+    const distance = document.getElementById('custom-distance').value.trim();
+    const desc = document.getElementById('custom-desc').value.trim();
+    const intensity = document.getElementById('custom-intensity').value;
+    
+    if (!name || !distance) {
+        alert('Bitte Name und Distanz/Dauer eingeben!');
+        return;
+    }
+    
+    const newTemplate = {
+        id: 'custom_' + Date.now(),
+        sport: sport,
+        name: name,
+        distance: distance,
+        desc: desc,
+        intensity: intensity
+    };
+    
+    state.customTemplates.push(newTemplate);
+    saveState();
+    
+    document.getElementById('custom-name').value = '';
+    document.getElementById('custom-distance').value = '';
+    document.getElementById('custom-desc').value = '';
+    
+    alert('✅ Vorlage gespeichert!');
+    renderTemplates();
+}
+
+// ==================== DATA EXPORT/IMPORT ====================
+function exportData() {
+    const dataStr = JSON.stringify(state, null, 2);
+    const blob = new Blob([dataStr], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `uwe-training-${new Date().toISOString().split('T')[0]}.json`;
+    a.click();
+    
+    URL.revokeObjectURL(url);
+}
+
+function importData(input) {
+    const file = input.files[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const imported = JSON.parse(e.target.result);
+            if (imported.workouts && imported.log) {
+                state = imported;
+                saveState();
+                alert('✅ Daten erfolgreich importiert!');
+                renderCalendar();
+                renderLog();
+            } else {
+                alert('❌ Ungültiges Dateiformat!');
+            }
+        } catch (err) {
+            alert('❌ Fehler beim Import: ' + err.message);
+        }
+    };
+    reader.readAsText(file);
+}
+
+function clearAllData() {
+    if (confirm('⚠️ Wirklich ALLE Daten löschen? Dies kann nicht rückgängig gemacht werden!')) {
+        localStorage.removeItem('uwe-triathlon-state');
+        state = { workouts: {}, customTemplates: [], log: [] };
+        renderCalendar();
+        renderLog();
+        alert('✅ Alle Daten wurden gelöscht.');
+    }
+}
+
+// ==================== INIT ====================
+updateCountdown();
+renderCalendar();
+setInterval(updateCountdown, 60000);
+</script>
+</body>
+</html>
