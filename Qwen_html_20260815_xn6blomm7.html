@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Uwes Lauf-Coach | 10km am 27.09.</title>
+<style>
+    :root {
+        --primary: #2563eb;
+        --primary-dark: #1e40af;
+        --success: #16a34a;
+        --warning: #d97706;
+        --danger: #dc2626;
+        --bg: #f8fafc;
+        --card: #ffffff;
+        --text: #1e293b;
+        --text-light: #64748b;
+        --border: #e2e8f0;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+    body { background: var(--bg); color: var(--text); padding-bottom: 40px; }
+    
+    .container { max-width: 600px; margin: 0 auto; padding: 16px; }
+    
+    header {
+        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+        color: white;
+        padding: 24px 16px;
+        border-radius: 0 0 24px 24px;
+        margin-bottom: 16px;
+        box-shadow: 0 4px 12px rgba(37,99,235,0.3);
+    }
+    header h1 { font-size: 1.5rem; margin-bottom: 4px; }
+    header p { opacity: 0.9; font-size: 0.9rem; }
+    
+    .countdown {
+        background: rgba(255,255,255,0.15);
+        border-radius: 12px;
+        padding: 12px;
+        margin-top: 12px;
+        text-align: center;
+        font-weight: 600;
+    }
+    .countdown .tapering { color: #fbbf24; font-size: 0.85rem; margin-top: 4px; }
+    
+    .tabs {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 16px;
+        background: var(--card);
+        padding: 6px;
+        border-radius: 12px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    .tab {
+        flex: 1;
+        padding: 10px 4px;
+        text-align: center;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: var(--text-light);
+        transition: all 0.2s;
+        border: none;
+        background: transparent;
+    }
+    .tab.active { background: var(--primary); color: white; }
+    
+    .section { display: none; }
+    .section.active { display: block; }
+    
+    .card {
+        background: var(--card);
+        border-radius: 16px;
+        padding: 20px;
+        margin-bottom: 16px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    }
+    .card h2 { font-size: 1.1rem; margin-bottom: 12px; color: var(--primary-dark); }
+    .card h3 { font-size: 1rem; margin: 12px 0 8px; }
+    
+    label { display: block; font-size: 0.85rem; font-weight: 600; margin: 12px 0 6px; color: var(--text-light); }
+    select, input, textarea {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        font-size: 1rem;
+        background: white;
+    }
+    
+    .btn {
+        display: block;
+        width: 100%;
+        padding: 14px;
+        background: var(--primary);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        font-size: 1rem;
+        font-weight: 700;
+        cursor: pointer;
+        margin-top: 16px;
+        transition: transform 0.1s;
+    }
+    .btn:active { transform: scale(0.98); }
+    .btn.secondary { background: #e2e8f0; color: var(--text); }
+    
+    .recommendation {
+        background: #eff6ff;
+        border-left: 4px solid var(--primary);
+        border-radius: 10px;
+        padding: 16px;
+        margin-top: 16px;
+    }
+    .recommendation h3 { margin-top: 0; }
+    .recommendation .module-name { font-size: 1.2rem; font-weight: 700; color: var(--primary-dark); }
+    
+    .warning {
+        background: #fef3c7;
+        border-left: 4px solid var(--warning);
+        border-radius: 10px;
+        padding: 12px;
+        margin-top: 12px;
+        font-size: 0.9rem;
+    }
+    
+    .module-card {
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 16px;
+        margin-bottom: 12px;
+    }
+    .module-card .header-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 8px;
+    }
+    .badge {
+        font-size: 0.75rem;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-weight: 700;
+    }
+    .badge.hard { background: #fee2e2; color: var(--danger); }
+    .badge.medium { background: #fef3c7; color: var(--warning); }
+    .badge.easy { background: #dcfce7; color: var(--success); }
+    
+    .week-grid { display: grid; gap: 8px; }
+    .day-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px;
+        background: #f1f5f9;
+        border-radius: 10px;
+    }
+    .day-row .day-name { width: 80px; font-weight: 700; font-size: 0.9rem; }
+    .day-row select { flex: 1; padding: 8px; }
+    
+    .volume-bar {
+        height: 10px;
+        background: #e2e8f0;
+        border-radius: 5px;
+        overflow: hidden;
+        margin: 12px 0;
+    }
+    .volume-fill { height: 100%; background: var(--primary); transition: width 0.3s; }
+    .volume-fill.over { background: var(--danger); }
+    
+    .log-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px;
+        border-bottom: 1px solid var(--border);
+    }
+    .log-item input[type="checkbox"] { width: auto; }
+    .log-item .details { flex: 1; font-size: 0.9rem; }
+    .log-item .details small { color: var(--text-light); }
+    
+    .chat-box {
+        background: #f1f5f9;
+        border-radius: 12px;
+        padding: 12px;
+        height: 200px;
+        overflow-y: auto;
+        margin-bottom: 12px;
+        font-size: 0.9rem;
+    }
+    .chat-msg { margin-bottom: 8px; }
+    .chat-msg.coach { font-weight: 600; color: var(--primary-dark); }
+    
+    @media (max-width: 400px) {
+        .tab { font-size: 0.75rem; padding: 8px 2px; }
+    }
+</style>
+</head>
+<body>
+
+<header>
+    <div class="container" style="padding:0">
+        <h1>🏃‍♂️ Uwes Lauf-Coach</h1>
+        <p>Ziel: 10km am 27. September</p>
+        <div class="countdown">
+            <span id="countdown-text"></span>
+            <div class="tapering" id="tapering-hint"></div>
+        </div>
+    </div>
+</header>
+
+<div class="container">
+    <div class="tabs">
+        <button class="tab active" onclick="switchTab('coach', this)">🤖 Coach</button>
+        <button class="tab" onclick="switchTab('week', this)">📅 Woche</button>
+        <button class="tab" onclick="switchTab('modules', this)">📦 Module</button>
+        <button class="tab" onclick="switchTab('log', this)">📖 Log</button>
+    </div>
+
+    <!-- COACH SECTION -->
+    <div id="coach" class="section active">
+        <div class="card">
+            <h2>Hey Uwe! 👋</h2>
+            <p style="font-size:0.9rem; color:var(--text-light); margin-bottom:12px">
+                Lass uns schauen, was heute für dich passt. Beantworte kurz zwei Fragen:
+            </p>
+            
+            <label>Wie viel Zeit hast du heute?</label>
+            <select id="time-select">
+                <option value="30">⚡ 30 Minuten</option>
+                <option value="45">🕐 45 Minuten</option>
+                <option value="60" selected>🕰️ 60 Minuten</option>
+                <option value="90">🏋️ 90+ Minuten</option>
+            </select>
+            
+            <label>Wie fühlen sich deine Beine an? (1 = schwer, 10 = frisch)</label>
+            <select id="legs-select">
+                <option value="1">1 – Total platt</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5 – Okay</option>
+                <option value="6">6</option>
+                <option value="7" selected>7 – Gut</option>
+                <option value="8">8</option>
+                <option value="9">9</option>
+                <option value="10">10 – Frisch wie am ersten Tag</option>
+            </select>
+            
+            <button class="btn" onclick="recommendWorkout()">💡 Empfehlung holen</button>
+            
+            <div id="recommendation-output"></div>
+        </div>
+    </div>
+
+    <!-- WEEK SECTION -->
+    <div id="week" class="section">
+        <div class="card">
+            <h2>Deine Woche planen</h2>
+            <p style="font-size:0.85rem; color:var(--text-light); margin-bottom:12px">
+                Weise den Tagen Module zu. Ich überwache dein Wochenvolumen (max. 20 km).
+            </p>
+            
+            <div class="volume-bar">
+                <div class="volume-fill" id="volume-fill" style="width:0%"></div>
+            </div>
+            <div style="display:flex; justify-content:space-between; font-size:0.85rem; margin-bottom:16px">
+                <span id="volume-text">0 km / 20 km</span>
+                <span id="volume-status"></span>
+            </div>
+            
+            <div class="week-grid" id="week-grid"></div>
+            <button class="btn secondary" onclick="clearWeek()">🗑️ Woche leeren</button>
+        </div>
+    </div>
+
+    <!-- MODULES SECTION -->
+    <div id="modules" class="section">
+        <div class="card">
+            <h2>Dein Modul-Baukasten</h2>
+            <div id="modules-list"></div>
+        </div>
+    </div>
+
+    <!-- LOG SECTION -->
+    <div id="log" class="section">
+        <div class="card">
+            <h2>Erledigte Einheiten</h2>
+            <div id="log-list"><p style="color:var(--text-light); font-size:0.9rem">Noch nichts absolviert. Plane eine Einheit und hake sie hier ab! 💪</p></div>
+        </div>
+    </div>
+</div>
+
+<script>
+// ==================== KONFIGURATION ====================
+const RACE_DATE = new Date('2026-09-27');
+const MAX_WEEKLY_KM = 20;
+const UWE_BASE_PACE = '5:30'; // min/km aus Triathlon-Splits
+
+const MODULES = [
+    {
+        id: 'vo2max',
+        name: '🔥 VO2max-Intervalle',
+        km: 8,
+        intensity: 'hard',
+        desc: '5 × 1.000m in 4:50–5:00 min/km, dazwischen 2 Min Trabpause. Alternativ: 4×4 Min hart auf dem Rad.',
+        pace: '4:50–5:00',
+        rpe: '9/10'
+    },
+    {
+        id: 'schwelle',
+        name: '⚡ Schwellenlauf',
+        km: 8,
+        intensity: 'hard',
+        desc: '2 km einlaufen, 4–5 km im "Wohlfühl-Härtebereich" (5:15–5:25 min/km), 1 km auslaufen.',
+        pace: '5:15–5:25',
+        rpe: '7–8/10'
+    },
+    {
+        id: 'lang',
+        name: '🐢 Langer ruhiger Lauf',
+        km: 10,
+        intensity: 'easy',
+        desc: '8–11 km ganz locker in Zone 2. Du musst dich in ganzen Sätzen unterhalten können!',
+        pace: '6:00–6:30',
+        rpe: '4–5/10'
+    },
+    {
+        id: 'fahrtspiel',
+        name: '🎲 Fahrtspiel',
+        km: 6,
+        intensity: 'medium',
+        desc: '30–40 Min Dauerlauf mit spielerischen Tempowechseln (z.B. bis zur nächsten Laterne schnell, dann 2 Min locker).',
+        pace: 'variabel',
+        rpe: '6–7/10'
+    },
+    {
+        id: 'athletik',
+        name: '🧘 Athletik & Mobility',
+        km: 0,
+        intensity: 'easy',
+        desc: 'Lauf-ABC (Skipping, Anfersen), Core (Planks), Hüftöffnung. Perfekt nach dem Radfahren!',
+        pace: '—',
+        rpe: '3/10'
+    }
+];
+
+const DAYS = ['Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag', 'Sonntag'];
+
+// ==================== STATE ====================
+let state = loadState();
+
+function loadState() {
+    try {
+        const saved = localStorage.getItem('uwe-coach-state');
+        return saved ? JSON.parse(saved) : { week: {}, log: [] };
+    } catch {
+        return { week: {}, log: [] };
+    }
+}
+
+function saveState() {
+    localStorage.setItem('uwe-coach-state', JSON.stringify(state));
+}
+
+// ==================== UI LOGIC ====================
+function switchTab(tabId, btn) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.getElementById(tabId).classList.add('active');
+    btn.classList.add('active');
+}
+
+// ==================== COUNTDOWN ====================
+function updateCountdown() {
+    const now = new Date();
+    const diffTime = RACE_DATE - now;
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    
+    const el = document.getElementById('countdown-text');
+    const hint = document.getElementById('tapering-hint');
+    
+    if (diffDays > 0) {
+        el.textContent = `⏱️ Noch ${diffDays} Tage bis zum 10km-Lauf`;
+    } else if (diffDays === 0) {
+        el.textContent = `🎯 HEUTE IST RACEDAY! Viel Erfolg, Uwe!`;
+    } else {
+        el.textContent = `✅ Der Lauf ist geschafft!`;
+    }
+    
+    // Tapering-Warnung (7 Tage vorher)
+    if (diffDays <= 7 && diffDays > 0) {
+        hint.textContent = `⚠️ Tapering-Phase: Keine harten Intervalle mehr! Volumen reduzieren.`;
+    } else if (diffDays <= 0) {
+        hint.textContent = '';
+    } else {
+        hint.textContent = '';
+    }
+}
+
+// ==================== COACH LOGIC ====================
+function getWeekVolume() {
+    return Object.values(state.week).reduce((sum, moduleId) => {
+        if (!moduleId) return sum;
+        const mod = MODULES.find(m => m.id === moduleId);
+        return sum + (mod ? mod.km : 0);
+    }, 0);
+}
+
+function hasHardWorkoutThisWeek() {
+    return Object.values(state.week).some(id => id === 'vo2max' || id === 'schwelle');
+}
+
+function isTapering() {
+    const diffDays = Math.ceil((RACE_DATE - new Date()) / (1000 * 60 * 60 * 24));
+    return diffDays <= 7 && diffDays > 0;
+}
+
+function recommendWorkout() {
+    const time = parseInt(document.getElementById('time-select').value);
+    const legs = parseInt(document.getElementById('legs-select').value);
+    const currentVolume = getWeekVolume();
+    const tapering = isTapering();
+    const hardThisWeek = hasHardWorkoutThisWeek();
+    
+    let rec = null;
+    let reason = '';
+    
+    // Tapering-Regel: Keine harten Einheiten
+    if (tapering) {
+        if (time >= 60) {
+            rec = MODULES.find(m => m.id === 'lang');
+            reason = 'Tapering-Phase: Ein kurzer, lockerer Dauerlauf hält die Spannung, ohne zu ermüden.';
+        } else {
+            rec = MODULES.find(m => m.id === 'athletik');
+            reason = 'Tapering-Phase: Mobility und leichtes Einrollen statt Belastung.';
+        }
+    }
+    // Müde Beine
+    else if (legs <= 4) {
+        rec = MODULES.find(m => m.id === 'athletik');
+        reason = 'Deine Beine sind schwer – Regeneration ist heute wichtiger als Training. Mobility bringt dich morgen weiter!';
+    }
+    // Kurze Zeit
+    else if (time <= 30) {
+        rec = MODULES.find(m => m.id === 'fahrtspiel');
+        reason = 'Bei 30 Minuten ist das Fahrtspiel perfekt: kurzer, intensiver Reiz ohne lange Belastung.';
+    }
+    // Viel Zeit -> Langer Lauf
+    else if (time >= 90) {
+        if (currentVolume + 10 > MAX_WEEKLY_KM) {
+            rec = MODULES.find(m => m.id === 'fahrtspiel');
+            reason = '⚠️ Dein Wochenvolumen ist fast voll. Statt 10 km lang machen wir ein kompakteres Fahrtspiel.';
+        } else {
+            rec = MODULES.find(m => m.id === 'lang');
+            reason = 'Perfekt für den langen, ruhigen Lauf! Baue deine Grundausdauer für die 10 km aus.';
+        }
+    }
+    // Mittlere Zeit
+    else {
+        if (!hardThisWeek && legs >= 7) {
+            rec = MODULES.find(m => m.id === 'vo2max');
+            reason = 'Du hast noch keine harte Einheit diese Woche und die Beine sind frisch – Zeit für VO2max!';
+        } else if (hardThisWeek && legs >= 6) {
+            rec = MODULES.find(m => m.id === 'schwelle');
+            reason = 'Harte Intervalle sind schon erledigt. Ein moderater Schwellenlauf passt heute gut.';
+        } else {
+            rec = MODULES.find(m => m.id === 'fahrtspiel');
+            reason = 'Solide Mitte: Ein Fahrtspiel bringt Tempo, ohne zu überlasten.';
+        }
+    }
+    
+    // Volumen-Check
+    const newVolume = currentVolume + rec.km;
+    let volumeWarning = '';
+    if (newVolume > MAX_WEEKLY_KM) {
+        volumeWarning = `<div class="warning">⚠️ Achtung: Mit dieser Einheit wärst du bei <strong>${newVolume} km</strong> (max. ${MAX_WEEKLY_KM} km empfohlen). Höre auf deinen Körper!</div>`;
+    }
+    
+    const intensityBadge = rec.intensity === 'hard' ? 'hart' : rec.intensity === 'medium' ? 'mittel' : 'locker';
+    
+    document.getElementById('recommendation-output').innerHTML = `
+        <div class="recommendation">
+            <h3>💡 Meine Empfehlung:</h3>
+            <div class="module-name">${rec.name}</div>
+            <p style="margin:8px 0; font-size:0.9rem">${reason}</p>
+            <div style="font-size:0.85rem; background:white; padding:10px; border-radius:8px; margin-top:8px">
+                <strong>Details:</strong> ${rec.km} km · Pace ${rec.pace} · Intensität: ${intensityBadge}<br>
+                <span style="color:var(--text-light)">${rec.desc}</span>
+            </div>
+            ${volumeWarning}
+            <button class="btn" onclick="addToLog('${rec.id}')">✅ Als erledigt markieren</button>
+        </div>
+    `;
+}
+
+// ==================== WEEK PLANNER ====================
+function renderWeek() {
+    const grid = document.getElementById('week-grid');
+    grid.innerHTML = '';
+    
+    DAYS.forEach((day, i) => {
+        const row = document.createElement('div');
+        row.className = 'day-row';
+        
+        const options = MODULES.map(m => 
+            `<option value="${m.id}" ${state.week[i] === m.id ? 'selected' : ''}>${m.name}</option>`
+        ).join('');
+        
+        row.innerHTML = `
+            <div class="day-name">${day}</div>
+            <select onchange="updateWeek(${i}, this.value)">
+                <option value="">— Frei —</option>
+                ${options}
+            </select>
+        `;
+        grid.appendChild(row);
+    });
+    
+    updateVolumeBar();
+}
+
+function updateWeek(dayIndex, moduleId) {
+    if (moduleId === '') {
+        delete state.week[dayIndex];
+    } else {
+        state.week[dayIndex] = moduleId;
+    }
+    saveState();
+    updateVolumeBar();
+}
+
+function updateVolumeBar() {
+    const volume = getWeekVolume();
+    const pct = Math.min((volume / MAX_WEEKLY_KM) * 100, 100);
+    const fill = document.getElementById('volume-fill');
+    fill.style.width = pct + '%';
+    fill.className = 'volume-fill' + (volume > MAX_WEEKLY_KM ? ' over' : '');
+    
+    document.getElementById('volume-text').textContent = `${volume} km / ${MAX_WEEKLY_KM} km`;
+    const status = document.getElementById('volume-status');
+    if (volume > MAX_WEEKLY_KM) {
+        status.textContent = '⚠️ Über Limit!';
+        status.style.color = 'var(--danger)';
+    } else if (volume > MAX_WEEKLY_KM * 0.8) {
+        status.textContent = '⚡ Fast voll';
+        status.style.color = 'var(--warning)';
+    } else {
+        status.textContent = '✅ Im Rahmen';
+        status.style.color = 'var(--success)';
+    }
+}
+
+function clearWeek() {
+    if (confirm('Wirklich die gesamte Woche leeren?')) {
+        state.week = {};
+        saveState();
+        renderWeek();
+    }
+}
+
+// ==================== MODULES LIST ====================
+function renderModules() {
+    const list = document.getElementById('modules-list');
+    list.innerHTML = MODULES.map(m => {
+        const badgeClass = m.intensity === 'hard' ? 'hard' : m.intensity === 'medium' ? 'medium' : 'easy';
+        const badgeText = m.intensity === 'hard' ? 'Hart' : m.intensity === 'medium' ? 'Mittel' : 'Locker';
+        return `
+            <div class="module-card">
+                <div class="header-row">
+                    <strong>${m.name}</strong>
+                    <span class="badge ${badgeClass}">${badgeText}</span>
+                </div>
+                <p style="font-size:0.9rem; color:var(--text-light); margin-bottom:8px">${m.desc}</p>
+                <div style="font-size:0.8rem; color:var(--text-light)">
+                    📏 ${m.km} km · ⏱️ Pace: ${m.pace} · 💪 RPE: ${m.rpe}
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+// ==================== LOG ====================
+function addToLog(moduleId) {
+    const mod = MODULES.find(m => m.id === moduleId);
+    if (!mod) return;
+    
+    state.log.unshift({
+        id: Date.now(),
+        moduleId: moduleId,
+        date: new Date().toLocaleDateString('de-DE'),
+        done: true
+    });
+    saveState();
+    renderLog();
+    alert(`✅ "${mod.name}" wurde als erledigt gespeichert!`);
+}
+
+function toggleLog(id) {
+    const item = state.log.find(l => l.id === id);
+    if (item) {
+        item.done = !item.done;
+        saveState();
+        renderLog();
+    }
+}
+
+function deleteLog(id) {
+    state.log = state.log.filter(l => l.id !== id);
+    saveState();
+    renderLog();
+}
+
+function renderLog() {
+    const list = document.getElementById('log-list');
+    if (state.log.length === 0) {
+        list.innerHTML = '<p style="color:var(--text-light); font-size:0.9rem">Noch nichts absolviert. Plane eine Einheit und hake sie hier ab! 💪</p>';
+        return;
+    }
+    
+    list.innerHTML = state.log.map(item => {
+        const mod = MODULES.find(m => m.id === item.moduleId);
+        return `
+            <div class="log-item" style="${item.done ? '' : 'opacity:0.5'}">
+                <input type="checkbox" ${item.done ? 'checked' : ''} onchange="toggleLog(${item.id})">
+                <div class="details">
+                    <strong>${mod ? mod.name : 'Unbekannt'}</strong><br>
+                    <small>${item.date} · ${mod ? mod.km + ' km' : '0 km'}</small>
+                </div>
+                <button onclick="deleteLog(${item.id})" style="background:none; border:none; cursor:pointer; font-size:1.2rem">🗑️</button>
+            </div>
+        `;
+    }).join('');
+}
+
+// ==================== INIT ====================
+updateCountdown();
+renderWeek();
+renderModules();
+renderLog();
+setInterval(updateCountdown, 60000); // Countdown jede Minute aktualisieren
+</script>
+</body>
+</html>
